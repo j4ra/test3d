@@ -6,20 +6,38 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                      LPSTR lpCmdLine, 
                      int cmdShow)
 {
+    try
+    {
     Window wnd(800, 600, "Window0");
     
     MSG msg;
     BOOL gResult;
 
-    while (gResult = GetMessage(&msg, NULL, 0, 0) > 0)
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+
+        while (gResult = GetMessage(&msg, NULL, 0, 0) > 0)
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        if (gResult == -1)
+        {
+            return -1;
+        }
+
+        return msg.wParam;
     }
-    if (gResult == -1)
+    catch (const BaseException& e)
     {
-        return -1;
+        MessageBox(NULL, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+    }
+    catch (const std::exception& e)
+    {
+        MessageBox(NULL, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
+    }
+    catch (...)
+    {
+        MessageBox(NULL, "No details avialable!", "Unknown", MB_OK | MB_ICONEXCLAMATION);
     }
 
-    return msg.wParam;
+    return -1;
 }

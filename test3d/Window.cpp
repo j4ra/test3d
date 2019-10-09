@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <sstream>
 
 Window::WindowClass Window::WindowClass::wndClass;
 
@@ -37,7 +38,10 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 }
 
 
-Window::Window(int width, int height, const char* name) noexcept
+
+
+
+Window::Window(int width, int height, const char* name)
 {
     constexpr DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
 
@@ -54,6 +58,11 @@ Window::Window(int width, int height, const char* name) noexcept
         CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
         NULL, NULL, WindowClass::GetInstance(), this
     );
+
+    if (hWnd == NULL)
+    {
+        throw BWND_LAST_ERROR();
+    }
 
     ShowWindow(hWnd, SW_SHOWDEFAULT);
 }
@@ -95,4 +104,55 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         return 0;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+
+
+
+
+Window::Exception::Exception(int line, const char * file, HRESULT hr) noexcept
+    : BaseException(line, file), hr(hr)
+{}
+
+const char * Window::Exception::what() const noexcept
+{
+    std::stringstream oss;
+    oss << GetType() << std::endl
+        << "[Error Code] " << GetErrorCode() << std::endl
+        << "[Description] " << GetErrorString() << std::endl
+        << GetOriginString();
+
+    whatBuffer = oss.str();
+    return whatBuffer.c_str();
+}
+
+const char * Window::Exception::GetType() const noexcept
+{
+    return "Window Exception";
+}
+
+std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+{
+    char* pMsgBuf = NULL;
+    DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&pMsgBuf),
+        0, NULL);
+    if (nMsgLen == 0)
+    {
+        return "Unidentified Error Code";
+    }
+
+    std::string errorString = pMsgBuf;
+    LocalFree(pMsgBuf);
+    return errorString;
+}
+
+HRESULT Window::Exception::GetErrorCode() const noexcept
+{
+    return hr;
+}
+
+std::string Window::Exception::GetErrorString() const noexcept
+{
+    return TranslateErrorCode(hr);
 }

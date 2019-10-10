@@ -56,7 +56,7 @@ Window::Window(int width, int height, const char* name) : wndClass(name)
     wr.top = 100;
     wr.bottom = height + wr.top;
 
-    AdjustWindowRect(&wr, style, FALSE);
+    if (!AdjustWindowRect(&wr, style, FALSE)) throw BWND_LAST_ERROR();
 
     hWnd = CreateWindow(
         wndClass.GetName(), name, style,
@@ -124,35 +124,36 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         kbd.ClearState();
         break;
 
-    case WM_MOUSEMOVE:
+    case WM_MOUSEMOVE: {
         POINTS pt = MAKEPOINTS(lParam);
         mouse.OnMouseMove(pt.x, pt.y);
-        break;
-    case WM_LBUTTONUP:
+        break; }
+    case WM_LBUTTONUP: {
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnLeftReleased(pt.x, pt.y);
-        break;
-    case WM_LBUTTONDOWN:
+        break; }
+    case WM_LBUTTONDOWN: {
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnLeftPressed(pt.x, pt.y);
-        break;
-    case WM_RBUTTONUP:
+        break; }
+    case WM_RBUTTONUP: {
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnRightReleased(pt.x, pt.y);
-        break;
-    case WM_RBUTTONDOWN:
+        break; }
+    case WM_RBUTTONDOWN: {
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnRightPressed(pt.x, pt.y);
-        break;
-    case WM_MBUTTONUP:
+        break; }
+    case WM_MBUTTONUP: {
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnMiddleReleased(pt.x, pt.y);
-        break;
-    case WM_MBUTTONDOWN:
+        break; }
+    case WM_MBUTTONDOWN: {
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnMiddlePressed(pt.x, pt.y);
-        break;
+        break; }
     case WM_MOUSEWHEEL:
+    {
         const POINTS pt = MAKEPOINTS(lParam);
         if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
         {
@@ -163,6 +164,7 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
             mouse.OnWheelDown(pt.x, pt.y);
         }
         break;
+    }
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }

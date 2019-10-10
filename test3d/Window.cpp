@@ -3,8 +3,11 @@
 #include <sstream>
 
 
-Window::WindowClass::WindowClass() : hInst(GetModuleHandle(NULL))
+Window::WindowClass::WindowClass(const char* name)
+    : hInst(GetModuleHandle(NULL)), wndClassName(WND_CLASS_NAME)
 {
+    wndClassName.append(name);
+
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(wc);
     wc.cbClsExtra = 0;
@@ -19,21 +22,19 @@ Window::WindowClass::WindowClass() : hInst(GetModuleHandle(NULL))
     wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));;
     wc.lpszClassName = GetName();
 
-    if (!RegisterClassEx(&wc))
-    {
-        throw BWND_LAST_ERROR();
-    }
+    if (!RegisterClassEx(&wc)) throw BWND_LAST_ERROR();
+
 }
 
 Window::WindowClass::~WindowClass()
 {
-    UnregisterClass(wndClassName, hInst);
+    UnregisterClass(GetName(), hInst);
     hInst = NULL;
 }
 
 const char* Window::WindowClass::GetName() noexcept
 {
-    return wndClassName;
+    return wndClassName.c_str();
 }
 
 HINSTANCE Window::WindowClass::GetInstance() noexcept
@@ -45,7 +46,7 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 
 
 
-Window::Window(int width, int height, const char* name) : wndClass()
+Window::Window(int width, int height, const char* name) : wndClass(name)
 {
     constexpr DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
     
@@ -63,10 +64,7 @@ Window::Window(int width, int height, const char* name) : wndClass()
         NULL, NULL, wndClass.GetInstance(), this
     );
 
-    if (hWnd == NULL)
-    {
-        throw BWND_LAST_ERROR();
-    }
+    if (hWnd == NULL) throw BWND_LAST_ERROR();
 
     ShowWindow(hWnd, SW_SHOWDEFAULT);
 }

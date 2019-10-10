@@ -27,12 +27,12 @@ private:
     public:
         const char* GetName() noexcept;
         HINSTANCE GetInstance() noexcept;
-        WindowClass();
+        WindowClass(const char* name);
         ~WindowClass();
         WindowClass(const WindowClass&) = delete;
         WindowClass& operator=(const WindowClass&) = delete;
     private:
-        static constexpr const char* wndClassName = WND_CLASS_NAME;
+        std::string wndClassName;
         HINSTANCE hInst;
     };
 public:

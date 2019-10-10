@@ -3,6 +3,7 @@
 #include "MiniWindows.h"
 #include "BaseException.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 #include <string>
 
 #define WND_CLASS_NAME "test3d window"
@@ -47,6 +48,7 @@ private:
     LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 public:
     Keyboard kbd;
+    Mouse mouse;
 private:
     WindowClass wndClass;
     int width;

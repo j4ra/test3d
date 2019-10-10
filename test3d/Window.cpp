@@ -22,13 +22,13 @@ Window::WindowClass::WindowClass(const char* name)
     wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));;
     wc.lpszClassName = GetName();
 
-    if (!RegisterClassEx(&wc)) throw BWND_LAST_ERROR();
+    if (RegisterClassEx(&wc) == 0) throw BWND_LAST_ERROR();
 
 }
 
 Window::WindowClass::~WindowClass()
 {
-    UnregisterClass(GetName(), hInst);
+    if(UnregisterClass(GetName(), hInst) == 0) throw BWND_LAST_ERROR();
     hInst = NULL;
 }
 
@@ -46,7 +46,8 @@ HINSTANCE Window::WindowClass::GetInstance() const noexcept
 
 
 
-Window::Window(int width, int height, const char* name) : wndClass(name)
+Window::Window(int width, int height, const char* name) 
+    : wndClass(name), height(height), width(width)
 {
     constexpr DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
     
@@ -56,7 +57,7 @@ Window::Window(int width, int height, const char* name) : wndClass(name)
     wr.top = 100;
     wr.bottom = height + wr.top;
 
-    if (!AdjustWindowRect(&wr, style, FALSE)) throw BWND_LAST_ERROR();
+    if (AdjustWindowRect(&wr, style, FALSE) == 0) throw BWND_LAST_ERROR();
 
     hWnd = CreateWindow(
         wndClass.GetName(), name, style,
@@ -73,6 +74,11 @@ Window::~Window()
 {
     DestroyWindow(hWnd);
     hWnd = NULL;
+}
+
+void Window::SetTitle(const std::string & title)
+{
+    if (SetWindowText(hWnd, title.c_str()) == 0) throw BWND_LAST_ERROR();
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -125,8 +131,28 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         break;
 
     case WM_MOUSEMOVE: {
-        POINTS pt = MAKEPOINTS(lParam);
-        mouse.OnMouseMove(pt.x, pt.y);
+        const POINTS pt = MAKEPOINTS(lParam);
+        if (pt.x >= 0 && pt.x < width && pt.y >= 0 && pt.y < height)
+        {
+            mouse.OnMouseMove(pt.x, pt.y);
+            if (!mouse.IsInWindow())
+            {
+                SetCapture(hWnd);
+                mouse.OnMouseEnter();
+            }
+        }
+        else
+        {
+            if (wParam & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON))
+            {
+                mouse.OnMouseMove(pt.x, pt.y);
+            }
+            else
+            {
+                mouse.OnMouseLeave();
+                ReleaseCapture();
+            }
+        }
         break; }
     case WM_LBUTTONUP: {
         const POINTS pt = MAKEPOINTS(lParam);
@@ -152,19 +178,11 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
         const POINTS pt = MAKEPOINTS(lParam);
         mouse.OnMiddlePressed(pt.x, pt.y);
         break; }
-    case WM_MOUSEWHEEL:
-    {
+    case WM_MOUSEWHEEL: {
         const POINTS pt = MAKEPOINTS(lParam);
-        if (GET_WHEEL_DELTA_WPARAM(wParam) > 0)
-        {
-            mouse.OnWheelUp(pt.x, pt.y);
-        }
-        else if (GET_WHEEL_DELTA_WPARAM(wParam) < 0)
-        {
-            mouse.OnWheelDown(pt.x, pt.y);
-        }
-        break;
-    }
+        const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+        mouse.OnWheelDelta(pt.x, pt.y, delta);
+        break; }
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }

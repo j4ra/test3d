@@ -10,7 +10,7 @@ class Mouse
 public:
     class Event {
     public:
-        enum class Type { LPress, LRelease, RPress, RRelease, MPress, MRelease, WheelUp, WheelDown, Move, Invalid };
+        enum class Type { LPress, LRelease, RPress, RRelease, MPress, MRelease, WheelUp, WheelDown, Move, Enter, Leave, Invalid };
     private:
         Type type;
         bool leftIsPressed;
@@ -44,6 +44,7 @@ public:
     bool RightIsPressed() const noexcept;
     bool LeftIsPressed() const noexcept;
     bool MiddleIsPressed() const noexcept;
+    bool IsInWindow() const noexcept;
 
     Event Read() noexcept;
     inline bool IsEmpty() const noexcept { return buffer.empty(); }
@@ -61,14 +62,20 @@ private:
 
     void OnWheelUp(int x, int y) noexcept;
     void OnWheelDown(int x, int y) noexcept;
+    void OnWheelDelta(int x, int y, int delta) noexcept;
+
+    void OnMouseLeave() noexcept;
+    void OnMouseEnter() noexcept;
 
     void TrimBuffer() noexcept;
 private:
     static constexpr unsigned int bufferSize = 16u;
     int x;
     int y;
-    bool leftIsPressed;
-    bool rightIsPressed;
-    bool middleIsPressed;
+    int wheelDeltaCarry = 0;
+    bool leftIsPressed = false;
+    bool rightIsPressed = false;
+    bool middleIsPressed = false;
+    bool isInWindow = false;
     std::queue<Event> buffer;
 };

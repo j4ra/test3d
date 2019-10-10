@@ -25,15 +25,14 @@ private:
     class WindowClass
     {
     public:
-        static const char* GetName() noexcept;
-        static HINSTANCE GetInstance() noexcept;
-    private:
-        WindowClass() noexcept;
+        const char* GetName() noexcept;
+        HINSTANCE GetInstance() noexcept;
+        WindowClass();
         ~WindowClass();
         WindowClass(const WindowClass&) = delete;
         WindowClass& operator=(const WindowClass&) = delete;
+    private:
         static constexpr const char* wndClassName = WND_CLASS_NAME;
-        static WindowClass wndClass;
         HINSTANCE hInst;
     };
 public:
@@ -46,6 +45,7 @@ private:
     static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 private:
+    WindowClass wndClass;
     int width;
     int height;
     HWND hWnd;

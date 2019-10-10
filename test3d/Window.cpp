@@ -2,9 +2,8 @@
 #include "resource.h"
 #include <sstream>
 
-Window::WindowClass Window::WindowClass::wndClass;
 
-Window::WindowClass::WindowClass() noexcept : hInst(GetModuleHandle(NULL))
+Window::WindowClass::WindowClass() : hInst(GetModuleHandle(NULL))
 {
     WNDCLASSEX wc = { 0 };
     wc.cbSize = sizeof(wc);
@@ -20,12 +19,16 @@ Window::WindowClass::WindowClass() noexcept : hInst(GetModuleHandle(NULL))
     wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));;
     wc.lpszClassName = GetName();
 
-    RegisterClassEx(&wc);
+    if (!RegisterClassEx(&wc))
+    {
+        throw BWND_LAST_ERROR();
+    }
 }
 
 Window::WindowClass::~WindowClass()
 {
-    UnregisterClass(wndClassName, GetInstance());
+    UnregisterClass(wndClassName, hInst);
+    hInst = NULL;
 }
 
 const char* Window::WindowClass::GetName() noexcept
@@ -35,17 +38,17 @@ const char* Window::WindowClass::GetName() noexcept
 
 HINSTANCE Window::WindowClass::GetInstance() noexcept
 {
-    return wndClass.hInst;
+    return hInst;
 }
 
 
 
 
 
-Window::Window(int width, int height, const char* name)
+Window::Window(int width, int height, const char* name) : wndClass()
 {
     constexpr DWORD style = WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU;
-
+    
     RECT wr;
     wr.left = 100;
     wr.right = width + wr.left;
@@ -55,9 +58,9 @@ Window::Window(int width, int height, const char* name)
     AdjustWindowRect(&wr, style, FALSE);
 
     hWnd = CreateWindow(
-        WindowClass::GetName(), name, style,
+        wndClass.GetName(), name, style,
         CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
-        NULL, NULL, WindowClass::GetInstance(), this
+        NULL, NULL, wndClass.GetInstance(), this
     );
 
     if (hWnd == NULL)

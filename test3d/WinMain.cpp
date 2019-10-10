@@ -9,7 +9,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     try
     {
     Window wnd(800, 600, "Window0");
-    Window wnd2(600, 800, "Window1");
 
     MSG msg;
     BOOL gResult;

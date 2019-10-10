@@ -32,12 +32,12 @@ Window::WindowClass::~WindowClass()
     hInst = NULL;
 }
 
-const char* Window::WindowClass::GetName() noexcept
+const char* Window::WindowClass::GetName() const noexcept
 {
     return wndClassName.c_str();
 }
 
-HINSTANCE Window::WindowClass::GetInstance() noexcept
+HINSTANCE Window::WindowClass::GetInstance() const noexcept
 {
     return hInst;
 }
@@ -104,6 +104,25 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
     case WM_CLOSE:
         PostQuitMessage(0);
         return 0;
+
+
+    case WM_SYSKEYDOWN:
+    case WM_KEYDOWN:
+        if (!(wParam & 0x40000000) || kbd.AutorepeatIsEnabled())
+        {
+            kbd.OnKeyPressed(static_cast<unsigned char>(wParam));
+        }
+        break;
+    case WM_SYSKEYUP:
+    case WM_KEYUP:
+        kbd.OnKeyReleased(static_cast<unsigned char>(wParam));
+        break;
+    case WM_CHAR:
+        kbd.OnChar(static_cast<unsigned char>(wParam));
+        break;
+    case WM_KILLFOCUS:
+        kbd.ClearState();
+        break;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }

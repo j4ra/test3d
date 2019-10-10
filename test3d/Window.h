@@ -2,6 +2,7 @@
 
 #include "MiniWindows.h"
 #include "BaseException.h"
+#include "Keyboard.h"
 #include <string>
 
 #define WND_CLASS_NAME "test3d window"
@@ -25,8 +26,8 @@ private:
     class WindowClass
     {
     public:
-        const char* GetName() noexcept;
-        HINSTANCE GetInstance() noexcept;
+        const char* GetName() const noexcept;
+        HINSTANCE GetInstance() const noexcept;
         WindowClass(const char* name);
         ~WindowClass();
         WindowClass(const WindowClass&) = delete;
@@ -44,6 +45,8 @@ private:
     static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+public:
+    Keyboard kbd;
 private:
     WindowClass wndClass;
     int width;

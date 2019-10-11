@@ -19,8 +19,14 @@ void App::Update()
 {
     const float t = time.Peek();
 
-    float a = 0.5 * (std::sin(t) + 1.0);
-    wnd.Gfx().ClearBuffer(a, a, 1.0);
+    float r = std::sin(t);
+    r *= r;
+    float g = std::sin(2 * t);
+    g *= g;
+    float b = std::sin(3 * t);
+    b *= b;
+
+    wnd.Gfx().ClearBuffer(r, g, b);
 
     wnd.Gfx().EndFrame();
 }

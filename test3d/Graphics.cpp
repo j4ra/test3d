@@ -6,6 +6,8 @@
 #define GFX_THROW_FAILED(hrcall) if(FAILED(hr = hrcall)) throw Graphics::HrException(__LINE__,__FILE__, hr)
 #define GFX_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException(__LINE__, __FILE__, hr)
 
+namespace WRL = Microsoft::WRL;
+
 Graphics::Graphics(HWND hWnd)
 {
     DXGI_SWAP_CHAIN_DESC sd = { };
@@ -48,19 +50,9 @@ Graphics::Graphics(HWND hWnd)
         &pContext
     ));
 
-    ID3D11Resource* pBackBuffer = NULL;
-    GFX_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer)));
-    GFX_THROW_FAILED(pDevice->CreateRenderTargetView(pBackBuffer, NULL, &pTarget));
-
-    pBackBuffer->Release();
-}
-
-Graphics::~Graphics()
-{
-    if (pSwap != NULL) pSwap->Release();
-    if (pContext != NULL) pContext->Release();
-    if (pDevice != NULL) pDevice->Release();
-    if (pTarget != NULL) pTarget->Release();
+    WRL::ComPtr<ID3D11Resource> pBackBuffer;
+    GFX_THROW_FAILED(pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer));
+    GFX_THROW_FAILED(pDevice->CreateRenderTargetView(pBackBuffer.Get(), NULL, &pTarget));
 }
 
 void Graphics::EndFrame()
@@ -83,7 +75,7 @@ void Graphics::EndFrame()
 void Graphics::ClearBuffer(float r, float g, float b) noexcept
 {
     const float color[] = { r, g, b, 1.0 };
-    pContext->ClearRenderTargetView(pTarget, color);
+    pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
 

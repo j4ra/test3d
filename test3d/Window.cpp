@@ -2,6 +2,9 @@
 #include "resource.h"
 #include <sstream>
 
+#define WND_EXCEPT(hr) Window::HrException(__LINE__, __FILE__, hr)
+#define WND_LAST_ERROR() Window::HrException(__LINE__, __FILE__, GetLastError())
+#define WND_NO_GFX_EXCEPT() Window::NoGfxException(__LINE__, __FILE__)
 
 Window::WindowClass::WindowClass(const char* name)
     : hInst(GetModuleHandle(NULL)), wndClassName(WND_CLASS_NAME)
@@ -22,13 +25,13 @@ Window::WindowClass::WindowClass(const char* name)
     wc.hIconSm = static_cast<HICON>(LoadImage(hInst, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 16, 16, 0));;
     wc.lpszClassName = GetName();
 
-    if (RegisterClassEx(&wc) == 0) throw BWND_LAST_ERROR();
+    if (RegisterClassEx(&wc) == 0) throw WND_LAST_ERROR();
 
 }
 
 Window::WindowClass::~WindowClass()
 {
-    if(UnregisterClass(GetName(), hInst) == 0) throw BWND_LAST_ERROR();
+    UnregisterClass(GetName(), hInst);
     hInst = NULL;
 }
 
@@ -57,7 +60,7 @@ Window::Window(int width, int height, const char* name)
     wr.top = 100;
     wr.bottom = height + wr.top;
 
-    if (AdjustWindowRect(&wr, style, FALSE) == 0) throw BWND_LAST_ERROR();
+    if (AdjustWindowRect(&wr, style, FALSE) == 0) throw WND_LAST_ERROR();
 
     hWnd = CreateWindow(
         wndClass.GetName(), name, style,
@@ -65,7 +68,7 @@ Window::Window(int width, int height, const char* name)
         NULL, NULL, wndClass.GetInstance(), this
     );
 
-    if (hWnd == NULL) throw BWND_LAST_ERROR();
+    if (hWnd == NULL) throw WND_LAST_ERROR();
 
     ShowWindow(hWnd, SW_SHOWDEFAULT);
 
@@ -81,12 +84,13 @@ Window::~Window()
 
 Graphics & Window::Gfx()
 {
+    if (!pGfx) throw WND_NO_GFX_EXCEPT();
     return *pGfx;
 }
 
 void Window::SetTitle(const std::string & title)
 {
-    if (SetWindowText(hWnd, title.c_str()) == 0) throw BWND_LAST_ERROR();
+    if (SetWindowText(hWnd, title.c_str()) == 0) throw WND_LAST_ERROR();
 }
 
 std::optional<int> Window::ProcessMessages()
@@ -212,17 +216,16 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 
 
 
-
-
-Window::Exception::Exception(int line, const char * file, HRESULT hr) noexcept
-    : BaseException(line, file), hr(hr)
+Window::HrException::HrException(int line, const char * file, HRESULT hr) noexcept
+    : Exception(line, file), hr(hr)
 {}
 
-const char * Window::Exception::what() const noexcept
+const char * Window::HrException::what() const noexcept
 {
     std::stringstream oss;
     oss << GetType() << std::endl
-        << "[Error Code] " << GetErrorCode() << std::endl
+        << "[Error Code] 0x" << std::hex << std::uppercase << GetErrorCode()
+        << std::dec << " (" << (unsigned long)GetErrorCode() << ")" << std::endl
         << "[Description] " << GetErrorString() << std::endl
         << GetOriginString();
 
@@ -230,15 +233,31 @@ const char * Window::Exception::what() const noexcept
     return whatBuffer.c_str();
 }
 
-const char * Window::Exception::GetType() const noexcept
+const char * Window::HrException::GetType() const noexcept
 {
     return "Window Exception";
 }
 
-std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
+HRESULT Window::HrException::GetErrorCode() const noexcept
+{
+    return hr;
+}
+
+std::string Window::HrException::GetErrorString() const noexcept
+{
+    
+    return TranslateMessage(hr);
+}
+
+const char * Window::NoGfxException::GetType() const noexcept
+{
+    return "No Graphics Exception";
+}
+
+std::string Window::Exception::TranslateMessage(HRESULT hr)
 {
     char* pMsgBuf = NULL;
-    DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+    const DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&pMsgBuf),
         0, NULL);
     if (nMsgLen == 0)
@@ -249,14 +268,4 @@ std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
     std::string errorString = pMsgBuf;
     LocalFree(pMsgBuf);
     return errorString;
-}
-
-HRESULT Window::Exception::GetErrorCode() const noexcept
-{
-    return hr;
-}
-
-std::string Window::Exception::GetErrorString() const noexcept
-{
-    return TranslateErrorCode(hr);
 }

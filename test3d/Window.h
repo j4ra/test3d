@@ -9,22 +9,35 @@
 #include <memory>
 #include <optional>
 
-#define WND_CLASS_NAME "test3d window"
+#define WND_CLASS_NAME "test3d_window"
 
 class Window 
 {
 public:
     class Exception : public BaseException
     {
+        using BaseException::BaseException;
     public:
-        Exception(int line, const char* file, HRESULT hr) noexcept;
-        const char* what() const noexcept override;
-        virtual const char* GetType() const noexcept;
-        static std::string TranslateErrorCode(HRESULT hr) noexcept;
-        HRESULT GetErrorCode() const noexcept;
+        static std::string TranslateMessage(HRESULT hr);
+    };
+    class HrException : public Exception
+    {
+        using Exception::Exception;
+    public:
+        HrException(int line, const char* file, HRESULT hr) noexcept;
         std::string GetErrorString() const noexcept;
+        HRESULT GetErrorCode() const noexcept;
+        const char* GetType() const noexcept override;
+        const char* what() const noexcept override;
     private:
         HRESULT hr;
+
+    };
+    class NoGfxException : public Exception
+    {
+        using Exception::Exception;
+    public:
+        const char* GetType() const noexcept override;
     };
 private:
     class WindowClass
@@ -63,6 +76,3 @@ private:
     HWND hWnd;
     std::unique_ptr<Graphics> pGfx;
 };
-
-#define BWND_EXCEPT(hr) Window::Exception(__LINE__, __FILE__, hr)
-#define BWND_LAST_ERROR() Window::Exception(__LINE__, __FILE__, GetLastError())

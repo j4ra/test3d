@@ -4,7 +4,9 @@
 #include "BaseException.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Graphics.h"
 #include <string>
+#include <memory>
 
 #define WND_CLASS_NAME "test3d window"
 
@@ -37,11 +39,13 @@ private:
         std::string wndClassName;
         HINSTANCE hInst;
     };
+
 public:
     Window(int width, int height, const char* name);
     ~Window();
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
+    Graphics& Gfx();
     void SetTitle(const std::string& title);
 private:
     static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -55,6 +59,7 @@ private:
     int width;
     int height;
     HWND hWnd;
+    std::unique_ptr<Graphics> pGfx;
 };
 
 #define BWND_EXCEPT(hr) Window::Exception(__LINE__, __FILE__, hr)

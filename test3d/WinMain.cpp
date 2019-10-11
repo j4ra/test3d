@@ -18,6 +18,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+            wnd.Gfx().EndFrame();
         }
         if (gResult == -1)
         {

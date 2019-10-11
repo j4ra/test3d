@@ -68,12 +68,20 @@ Window::Window(int width, int height, const char* name)
     if (hWnd == NULL) throw BWND_LAST_ERROR();
 
     ShowWindow(hWnd, SW_SHOWDEFAULT);
+
+    pGfx = std::make_unique<Graphics>(hWnd);
 }
 
 Window::~Window()
 {
+
     DestroyWindow(hWnd);
     hWnd = NULL;
+}
+
+Graphics & Window::Gfx()
+{
+    return *pGfx;
 }
 
 void Window::SetTitle(const std::string & title)

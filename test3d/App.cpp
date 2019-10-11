@@ -27,6 +27,6 @@ void App::Update()
     b *= b;
 
     wnd.Gfx().ClearBuffer(r, g, b);
-
+    wnd.Gfx().DrawTestTriangle();
     wnd.Gfx().EndFrame();
 }

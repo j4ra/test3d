@@ -1,5 +1,6 @@
 #include "MiniWindows.h"
-#include "Window.h"
+#include "App.h"
+#include "BaseException.h"
 
 int CALLBACK WinMain(HINSTANCE hInstance, 
                      HINSTANCE hPrevInstance, 
@@ -8,24 +9,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 {
     try
     {
-    Window wnd(800, 600, "Window0");
-
-    MSG msg;
-    BOOL gResult;
-
-
-        while (gResult = GetMessage(&msg, NULL, 0, 0) > 0)
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            wnd.Gfx().EndFrame();
-        }
-        if (gResult == -1)
-        {
-            return -1;
-        }
-
-        return msg.wParam;
+        return App{}.Run();
     }
     catch (const BaseException& e)
     {

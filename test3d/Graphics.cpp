@@ -38,7 +38,7 @@ Graphics::Graphics(HWND hWnd)
     );
 
     ID3D11Resource* pBackBuffer = NULL;
-    pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(pBackBuffer));
+    pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
     pDevice->CreateRenderTargetView(pBackBuffer, NULL, &pTarget);
 
     pBackBuffer->Release();

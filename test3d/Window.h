@@ -7,6 +7,7 @@
 #include "Graphics.h"
 #include <string>
 #include <memory>
+#include <optional>
 
 #define WND_CLASS_NAME "test3d window"
 
@@ -47,6 +48,7 @@ public:
     Window& operator=(const Window&) = delete;
     Graphics& Gfx();
     void SetTitle(const std::string& title);
+    static std::optional<int> ProcessMessages();
 private:
     static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

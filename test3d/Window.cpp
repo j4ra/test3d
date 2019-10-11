@@ -89,6 +89,21 @@ void Window::SetTitle(const std::string & title)
     if (SetWindowText(hWnd, title.c_str()) == 0) throw BWND_LAST_ERROR();
 }
 
+std::optional<int> Window::ProcessMessages()
+{
+    MSG msg;
+    while ( PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) )
+    {
+        if (msg.message == WM_QUIT)
+        {
+            return msg.wParam;
+        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return { };
+}
+
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     if (msg == WM_NCCREATE)

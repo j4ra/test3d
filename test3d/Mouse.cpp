@@ -124,12 +124,12 @@ void Mouse::OnWheelDown(int x, int y) noexcept
 void Mouse::OnWheelDelta(int x, int y, int delta) noexcept
 {
     wheelDeltaCarry += delta;
-    while (wheelDeltaCarry > WHEEL_DELTA)
+    while (wheelDeltaCarry >= WHEEL_DELTA)
     {
         OnWheelUp(x, y);
         wheelDeltaCarry -= WHEEL_DELTA;
     }
-    while (wheelDeltaCarry < -WHEEL_DELTA)
+    while (wheelDeltaCarry <= -WHEEL_DELTA)
     {
         OnWheelDown(x, y);
         wheelDeltaCarry += WHEEL_DELTA;

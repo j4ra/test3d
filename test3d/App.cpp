@@ -19,7 +19,7 @@ void App::Update()
 {
     const float t = time.Peek();
 
-    float r = std::sin(t);
+    float r = 0.5f * (std::sin(t) + 1);
     r *= r;
     float g = std::sin(2 * t);
     g *= g;
@@ -27,6 +27,6 @@ void App::Update()
     b *= b;
 
     wnd.Gfx().ClearBuffer(r, g, b);
-    wnd.Gfx().DrawTestTriangle();
+    wnd.Gfx().DrawTestTriangle(t, wnd.mouse.GetPosX() / 400.0f - 1.0f, 1.0f - wnd.mouse.GetPosY() / 300.0f);
     wnd.Gfx().EndFrame();
 }

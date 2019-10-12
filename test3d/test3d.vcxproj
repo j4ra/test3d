@@ -82,6 +82,9 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <UseFullPaths>true</UseFullPaths>
+      <CallingConvention>VectorCall</CallingConvention>
+      <AdditionalOptions>/arch:AVX</AdditionalOptions>
+      <PreprocessorDefinitions>_XM_F16C_INTRINSICS_;_MBCS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -99,6 +102,9 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <UseFullPaths>true</UseFullPaths>
+      <CallingConvention>VectorCall</CallingConvention>
+      <AdditionalOptions>/arch:AVX</AdditionalOptions>
+      <PreprocessorDefinitions>_XM_F16C_INTRINSICS_;_MBCS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -114,12 +120,14 @@
       <ConformanceMode>true</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_XM_F16C_INTRINSICS_;_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PreprocessSuppressLineNumbers>true</PreprocessSuppressLineNumbers>
       <UseFullPaths>false</UseFullPaths>
+      <CallingConvention>VectorCall</CallingConvention>
+      <AdditionalOptions>/arch:AVX</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -138,11 +146,13 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_XM_F16C_INTRINSICS_;_MBCS;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <PreprocessSuppressLineNumbers>true</PreprocessSuppressLineNumbers>
       <UseFullPaths>false</UseFullPaths>
+      <CallingConvention>VectorCall</CallingConvention>
+      <AdditionalOptions>/arch:AVX</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

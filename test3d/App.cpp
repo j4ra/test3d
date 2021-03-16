@@ -1,32 +1,63 @@
 #include "App.h"
+#include "RenderComponent.h"
+#include <sstream>
 
-App::App() : wnd(800,600,"Window0"), time()
-{}
-
-int App::Run()
-{
-    while (true)
+namespace Application {
+    App::App() : wnd(800, 600, "Window0"), time()
     {
-        if (const auto ecode = Window::ProcessMessages())
-        {
-            return *ecode;
+        gameObjects.push_back(std::make_unique<RenderComponent>());
+
+        for (auto& go : gameObjects) {
+            go->Start(time, wnd.Gfx());
         }
-        Update();
     }
-}
 
-void App::Update()
-{
-    const float t = time.Peek();
+    int App::Run()
+    {
+        while (true)
+        {
+            if (const auto ecode = Window::ProcessMessages())
+            {
+                return *ecode;
+            }
+            Update();
+        }
+    }
 
-    float r = 0.5f * (std::sin(t) + 1);
-    r *= r;
-    float g = std::sin(2 * t);
-    g *= g;
-    float b = std::sin(3 * t);
-    b *= b;
+    void App::Update()
+    {
+        time.Update();
 
-    wnd.Gfx().ClearBuffer(r, g, b);
-    wnd.Gfx().DrawTestTriangle(t, wnd.mouse.GetPosX() / 400.0f - 1.0f, 1.0f - wnd.mouse.GetPosY() / 300.0f);
-    wnd.Gfx().EndFrame();
+        if (frameTimes.size() >= 16)
+            frameTimes.pop_back();
+        frameTimes.push_front(time.DeltaTime());
+
+        float total = 0.0f;
+        for (auto& dt : frameTimes) {
+            total += dt;
+        }
+        total /= 16.0f;
+
+        std::ostringstream oss;
+        oss << "delta: " << total * 1000.0f << "ms";
+        wnd.SetTitle(oss.str());
+
+        const float t = time.TotalTime();
+
+        float r = 0.5f * (std::sin(t) + 1);
+        r *= r;
+        float g = std::sin(2 * t);
+        g *= g;
+        float b = std::sin(3 * t);
+        b *= b;
+        wnd.Gfx().ClearBuffer(r, g, b);
+        GameObject::Input input = { wnd.GetMouse(), wnd.GetKeyboard() };
+
+        for (auto& go : gameObjects) {
+            go->Update(time, wnd.Gfx(), input);
+        }
+
+        //wnd.Gfx().DrawTestTriangle(t, wnd.GetMouse().GetPosX() / 400.0f - 1.0f, 1.0f - wnd.GetMouse().GetPosY() / 300.0f);
+        wnd.Gfx().EndFrame();
+    }
 }

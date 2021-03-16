@@ -4,9 +4,11 @@
 #include <bitset>
 #include <utility>
 
+namespace Application { class Window; }
+
 class Mouse
 {
-    friend class Window;
+    friend class Application::Window;
 public:
     class Event {
     public:

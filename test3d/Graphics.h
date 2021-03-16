@@ -29,7 +29,11 @@ public:
     public:
         const char* GetType() const noexcept override;
     };
-
+public:
+    using BufferPtr = Microsoft::WRL::ComPtr<ID3D11Buffer>;
+    using VertexShaderPtr = Microsoft::WRL::ComPtr<ID3D11VertexShader>;
+    using PixelShaderPtr = Microsoft::WRL::ComPtr<ID3D11PixelShader>;
+    using InputLayoutPtr = Microsoft::WRL::ComPtr<ID3D11InputLayout>;
 public:
     Graphics(HWND hWnd);
     Graphics& operator=(const Graphics&) = delete;
@@ -37,7 +41,20 @@ public:
     ~Graphics() = default;
     void EndFrame();
     void ClearBuffer(float r, float g, float b) noexcept;
-    void DrawTestTriangle(float angle, float x, float y);
+    void CreateVertexShader(
+        const std::wstring& shaderSource, 
+        VertexShaderPtr& pVertexShader, 
+        InputLayoutPtr& pInputLayout,
+        const D3D11_INPUT_ELEMENT_DESC* inputDesc,
+        std::size_t inputDescSize);
+    void CreatePixelShader(
+        const std::wstring& shaderSource,
+        PixelShaderPtr& pPixelShader
+    );
+    inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetContext() { return pContext; }
+    void CreateBuffer(D3D11_BUFFER_DESC& bd, D3D11_SUBRESOURCE_DATA& sd, BufferPtr& buffer);
+    void DrawIndexed(std::size_t size);
+    //void DrawTestTriangle(float angle, float x, float y);
 private:
     Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
     Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;

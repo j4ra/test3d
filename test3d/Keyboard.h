@@ -3,10 +3,11 @@
 #include <queue>
 #include <bitset>
 
+namespace Application { class Window; }
+
 class Keyboard
 {
-    friend class Window;
-
+    friend class Application::Window;
 public:
     class Event {
     public: 

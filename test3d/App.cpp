@@ -5,11 +5,13 @@
 namespace Application {
     App::App() : wnd(800, 600, "Window0"), time()
     {
-        gameObjects.push_back(std::make_unique<RenderComponent>());
+        Rendering::Shaders::ShaderBank::InitializeShaders(wnd.Gfx());
 
+        gameObjects.push_back(std::make_unique<Rendering::RenderComponent>());
         for (auto& go : gameObjects) {
             go->Start(time, wnd.Gfx());
         }
+
     }
 
     int App::Run()

@@ -174,8 +174,10 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="BaseException.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="InputLayouts.h" />
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
@@ -183,6 +185,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="RenderComponent.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />

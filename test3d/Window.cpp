@@ -6,6 +6,8 @@
 #define WND_LAST_ERROR() Window::HrException(__LINE__, __FILE__, GetLastError())
 #define WND_NO_GFX_EXCEPT() Window::NoGfxException(__LINE__, __FILE__)
 
+using namespace Rendering;
+
 namespace Application {
     Window::WindowClass::WindowClass(const char* name)
         : hInst(GetModuleHandle(NULL)), wndClassName(WND_CLASS_NAME)

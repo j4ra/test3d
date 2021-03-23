@@ -1,7 +1,9 @@
 #pragma once
 
 #include <vector>
+#include "InputLayouts.h"
 
+template<typename V = Rendering::InputLayouts::VertexFormatPosCol, Rendering::InputLayouts::Layout l = Rendering::InputLayouts::PosCol>
 class Mesh {
 public:
     Mesh() {
@@ -21,11 +23,11 @@ public:
     inline virtual ~Mesh() = default;
 
     inline virtual std::size_t vb_size() const {
-        return vertecies.size() * sizeof(Vertex);
+        return vertecies.size() * sizeof(V);
     }
 
     inline virtual std::size_t vb_stride() const {
-        return sizeof(Vertex);
+        return sizeof(V);
     }
 
     inline virtual void* vb_data() const {
@@ -44,23 +46,17 @@ public:
         return (void*)indices.data();
     }
 
-private:
-    struct Vertex
-    {
-        float x;
-        float y;
-        std::uint8_t r;
-        std::uint8_t g;
-        std::uint8_t b;
-        std::uint8_t a;
-    };
+    inline Rendering::InputLayouts::InputLayoutInfo get_layout() const {
+        Rendering::InputLayouts::layouts[l];
+    }
 
+private:
     struct Triangle
     {
         short v0, v1, v2;
     };
 
-    std::vector<Vertex> vertecies;
+    std::vector<V> vertecies;
 
     std::vector<Triangle> indices;
 };

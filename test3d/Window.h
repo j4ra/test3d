@@ -60,7 +60,7 @@ namespace Application {
         ~Window();
         Window(const Window&) = delete;
         Window& operator=(const Window&) = delete;
-        Graphics& Gfx();
+        Rendering::Graphics& Gfx();
         inline const Mouse& GetMouse() { return mouse; }
         inline const Keyboard& GetKeyboard() { return kbd; }
         void SetTitle(const std::string& title);
@@ -76,6 +76,6 @@ namespace Application {
         int width;
         int height;
         HWND hWnd;
-        std::unique_ptr<Graphics> pGfx;
+        std::unique_ptr<Rendering::Graphics> pGfx;
     };
 }
